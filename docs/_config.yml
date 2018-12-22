@@ -1,0 +1,14 @@
+theme: jekyll-theme-leap-day
+title: Tyler McGinnis React Courses
+description: Notes by James Priest
+google_analytics: UA-121627234-5
+
+exclude: [
+  Gemfile,
+  Gemfile.lock,
+  node_modules/,
+  Gruntfile.js,
+  package-lock.json,
+  package.json,
+  src/
+]

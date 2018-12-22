@@ -1,3 +1,4 @@
+## Node
 # Logs
 logs
 *.log
@@ -78,3 +79,10 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+
+## Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
