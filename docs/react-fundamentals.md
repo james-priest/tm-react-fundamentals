@@ -281,6 +281,8 @@ The React API is pretty small because it relies heavily on the JS API.
 Instead of using `ng-repeat` or some other API specific to a framework, we are using JavaScript's built-in methods.
 
 ## 2. The React Ecosystem
+[![React Ecosystem](./assets/images/9-small.jpg)](./assets/images/9.jpg)
+
 The React ecosystem is made up of these five basic areas.
 
 - React

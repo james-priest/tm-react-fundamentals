@@ -4,4 +4,4 @@ These are notes on [Tyler McGinnis' React Fundamentals](https://tylermcginnis.co
 
 My notes:
 
-  - [React Fundamentals](react-fundamentals.html)
+- [React Fundamentals](react-fundamentals.html)
