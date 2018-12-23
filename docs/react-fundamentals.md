@@ -6,6 +6,8 @@ description: Notes by James Priest
 # React Fundamentals
 [<– back to React Fundamentals Code Notes homepage](index.html)
 
+[![React Fundamentals](./assets/images/10-small.jpg)](./assets/images/10.jpg)
+
 ---
 
 <!-- These are notes on [Tyler McGinnis' React Fundamentals](https://learn.tylermcginnis.com/courses) course. -->
