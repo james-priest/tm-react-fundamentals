@@ -766,7 +766,6 @@ Babel will actually do the transformations for us. It will transform JSX to JS a
 
 The packages we need to install are **@babel/core**, **@babel/preset-env**, and **@babel/preset-react**
 
-<!-- 
 ## 5. First React Component
 ### 5.1 Component explained
 React components use ES6. Here's an [introduction to ES6 classes](https://strongloop.com/strongblog/an-introduction-to-javascript-es6-classes/) that's pretty good.
@@ -848,4 +847,3 @@ What is a **Component**?
 What happens with JSX?
 
 > JSX is always going to get transpiled to React.createElement invocations (typically) via Babel.
- -->
