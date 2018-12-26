@@ -96,7 +96,7 @@ var Avatar = function() {
   )
 }
 
-<Avatar username="tylemcginnis" />
+<Avatar username="tylermcginnis" />
 ```
 
 So instead of composing two functions into another function, we are composing two components into another component.
@@ -183,7 +183,7 @@ This is very focused on **How**.
 ##### Declarative
 You walk into a restaurant and tell the host, "I am here with my significant other, Do you have a table for two?"
 
-This is focused on the **What**. We are trusting that the host will be able to accommodate the request without us providing explicit intstructions on how this is to be accomplished.
+This is focused on the **What**. We are trusting that the host will be able to accommodate the request without us providing explicit instructions on how this is to be accomplished.
 
 #### Is React Declarative
 
@@ -239,7 +239,7 @@ A static website is probably never going to break because it doesn't have to man
 
 [![Unidirectional data flow](./assets/images/6-small.jpg)](./assets/images/6.jpg)
 
-As the state updates, the UI is going to update as well. All we really need to do is worry about manageing state in our app for the UI to update according to that state.
+As the state updates, the UI is going to update as well. All we really need to do is worry about managing state in our app for the UI to update according to that state.
 
 ### 1.4 Explicit Mutations
 [![Explicit mutations](./assets/images/7-small.jpg)](./assets/images/7.jpg)
@@ -258,7 +258,7 @@ What `setStat` is going to do is update the state in the application but it's al
 >
 > In order to update state in a React application, we have to call `setState`
 
-Explicit Mutations means we are not setting eevent listeners or doing dirty checking. We are specifically calling `setState` so we know exactly when our UI will update. It updates when we explicitly call `setState`.
+Explicit Mutations means we are not setting event listeners or doing dirty checking. We are specifically calling `setState` so we know exactly when our UI will update. It updates when we explicitly call `setState`.
 
 ### 1.5 Just JavaScript
 
@@ -335,7 +335,7 @@ The nice thing about React Router is that it's just components. `<Link />` is co
 This is an extremely powerful tool that sometimes gets a bad wrap for being more complex than it actually is.
 
 ```js
-var path = require('path);
+var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -343,7 +343,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index_bundle.js'
-  }
+  },
   module: {
     rules: [
       { test: /\.(js)$/, use: 'babel-loader' },
@@ -354,7 +354,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'app/index.html'
     })
-  ]
+  ],
+  mode: 'development'
 };
 ```
 
@@ -371,6 +372,8 @@ It'll then bundle all the files into one file, output it to the `dist` folder, a
 ### 2.4 Babel
 
 > Babel is a code transformer
+
+We need to add an entry to `package.json` which includes instructions on what babel should transform.
 
 ```json
 "babel": {
@@ -509,4 +512,340 @@ Functional programming is a subset of declarative programming. We can start gett
 > 3 types of programming languages
 > - Procedural languages specify an explicit sequence of steps to follow
 > - Imperative languages specify explicit manipulation fo the computer's internal state
-> - Decarative languages express the logic of the computation without describing its control flow
+> - Declarative languages express the logic of the computation without describing its control flow
+
+## 4. React Setup
+### 4.1 Npm
+Some takeaways for npm are:
+
+- Npm manages modules through `package.json` so we don't have to manage these manually with script tags in the html
+  ```html
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="libs/jquery.js"></script>
+  ```
+- `package.json` should be created in the project root with the following.
+  ```bash
+  npm --init -y
+  ```
+- Packages should be installed as a dependency or dev-dependency
+  ```bash
+  npm install -save react react-dom
+  npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
+  ```
+- Npm scripts should be created to simplify tasks
+  ```json
+  "scripts": {
+    "test": "ava 'app/**/*.test.js' --verbose --require ./setup-tests.js",
+    "start": "webpack-dev-server --open"
+  }
+  ```
+
+#### npm installation
+Here's the full installation command for all packages used. This can be run at the terminal in one go.
+
+`npm install --save-dev @babel/core @babel/preset-env @babel/preset-react webpack webpack-cli webpack-dev-server babel-loader css-loader style-loader html-webpack-plugin`'
+
+### 4.2 Webpack 4
+Why does Webpack exist?
+
+> Webpack, at its core, is a code bundler
+>
+> It takes your code, transforms and bundles it, then returns a brand new version of your code.
+
+There are really 3 main steps and 3 main things webpack needs to know...
+
+1. The starting point of your application, or your root JavaScript file.
+2. Which transformations to make on your code.
+3. To which location it should save the new transformed code.
+
+Webpack configuration file should be named `webpack.config.js` and it should live in the root directory of our project.
+
+Next this file needs to export an object which is going to represent the configurations for webpack.
+
+```js
+// In webpack.config.js
+module.exports = {}
+```
+
+#### 1. Entry point
+This tells webpack where the entry point of our application is located.
+
+```js
+// In webpack.config.js
+module.exports = {
+  entry: './app/index.js',
+}
+```
+
+#### 2. Transformations
+This tells webpack what transformations to make. This is where **loaders** come in handy. We install these using `npm install --save-dev <pacakge-name>`.
+
+The loaders we'll be using are **babel-loader**, **style-loader**, and **css-loader**.
+
+```js
+// In webpack.config.js
+module.exports = {
+  entry: './app/index.js',
+  module: {
+    rules: [
+      { test: /\.(js)$/, use: 'babel-loader' },
+      { test: /\.css$/, use: { 'style-loader', 'css-loader' }}
+    ]
+  }
+}
+```
+
+The rules array contains all transformations. Each object contains a regex **test**, and if it matches, it tell webpack which loader to **use**.
+
+#### 3. Output
+This tells webpack where to place the output of the transformed code.
+
+```js
+// In webpack.config.js
+module.exports = {
+  entry: './app/index.js',
+  module: {
+    rules: [
+      { test: /\.(js)$/, use: 'babel-loader' },
+      { test: /\.css$/, use: { 'style-loader', 'css-loader' }}
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'index_bundle.js'
+  }
+}
+```
+
+**path** is the directory where the new filename (**index_bundle.js**) should be placed.
+
+#### HTML Template
+Here's the directory structure that our app has. Notice that there's no **index.html** in the **/dist** folder.
+
+```text
+/app
+  - components
+  - utils
+  index.js
+  index.html
+/dist
+  index_bundle.js
+package.json
+webpack.config.js
+.gitignore
+```
+
+We need to implement a plugin that will take our **app/index.html** file and create a copy in **dist/** with a reference to our new **index_bundle.js**.
+
+There's a plugin that does this called *html-webpack-plugin*. We install it with `npm install --save-dev html-webpack-plugin`.
+
+We update our config file with a **plugins** section and set `template` to our original **index.html**.
+
+```js
+// In webpack.config.js
+module.exports = {
+  entry: './app/index.js',
+  module: {
+    rules: [
+      { test: /\.(js)$/, use: 'babel-loader' },
+      { test: /\.css$/, use: { 'style-loader', 'css-loader' }}
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'index_bundle.js'
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'app/index.html'
+    })
+  ]
+}
+```
+
+Running webpack now will give us two file in our **dist/** folder.
+
+- **index_bundle.js** is the result of taking our entry code and running it through our loaders.
+- **index.html** was created on the fly with **HTMLWebpackPluginConfig** and is a copy of our original index.html file located in our **app** folder with a **script** tag referencing the newly created **index_bundle.js** file
+
+**app/index.html**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
+```
+
+**dist/index.html**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="index_bundle.js"></script>
+</body>
+</html>
+```
+
+The only difference between the two files is that the one in **dist** (which was created with HTMLWebpackPlugin) now has a script tag pointing to **index_bundle.js**.
+
+#### mode
+Finally, we need to specify whether we want webpack to run in "production" or "development" mode. Development mode will enable tooling for debugging and faster builds.
+
+```js
+// In webpack.config.js
+module.exports = {
+  entry: './app/index.js',
+  module: {
+    rules: [
+      { test: /\.(js)$/, use: 'babel-loader' },
+      { test: /\.css$/, use: { 'style-loader', 'css-loader' }}
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'index_bundle.js'
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'app/index.html'
+    })
+  ],
+  mode: "development"
+}
+```
+
+#### Run Webpack
+In order to run webpack we'll need to install **webpack** and **webpack-cli**. These can be installed as dev-dependencies.
+
+Then we'll need to add a script to our **package.json**
+
+**package.json**
+
+```json
+"scripts": {
+  "build": "webpack"
+},
+```
+
+In terminal we can run "**npm run build**" to do a one time run through of your settings then compile your code and output into a dist folder.
+
+To add a watch change **webpack** in your NPM script to run **webpack -w** and that will watch your files and re-execute webpack whenever any of the files Webpack is concerned about changes.
+
+If we want to run a dev server we'll need in install **webpack-dev-server** and add a new script.
+
+**package.json**
+
+```json
+"scripts": {
+  "build": "webpack",
+  "start": "webpack-dev-server --open"
+},
+```
+
+In terminal we can run "**npm run start**" to start the dev server. It will autoreload when we make changes to our code.
+
+The running instance is in memory so changes won't be reflected in the **dist** folder.
+
+### 4.3 Babel
+Babel will actually do the transformations for us. It will transform JSX to JS and will allow us to opt into future version on JavaScript (ES2015, ES 2016, etc.)
+
+The packages we need to install are **@babel/core**, **@babel/preset-env**, and **@babel/preset-react**
+
+<!-- 
+## 5. First React Component
+### 5.1 Component explained
+React components use ES6. Here's an [introduction to ES6 classes](https://strongloop.com/strongblog/an-introduction-to-javascript-es6-classes/) that's pretty good.
+
+```jsx
+var React = require('react');
+var ReactDOM = require('react-dom');
+class HelloWorld extends React.Component {
+  render() {
+    return (
+      <div>Hello World!</div>
+    )
+  }
+}
+ReactDOM.render(<HelloWorld />, document.getElementById('app'));
+```
+
+Notice that the only method on our class is the **render**. Every component is required to have a render method. The reason for that is render is describing the UI (user interface) for our component.
+
+**ReactDOM.render** takes in two arguments. The first argument is the component you want to render, the second argument is the DOM node where you want to render the component.
+
+In the example above we’re telling React to take our HelloWorld component and render it to the element with an ID of app. Because of the parent/child child relations of React, you usually only have to use ReactDOM.render once in your application because by rendering the most parent component, all child components will be rendered as well.
+
+[This React presentation](http://www.slideshare.net/floydophone/react-preso-v2) talks about why we don't need to worry about HTML, JS, & CSS violation separation of concerns.
+
+The "HTML" that you're writing in the render method isn't actually HTML but it's what React is calling "JSX". JSX simply allows us to write HTML like syntax which (eventually) gets transformed to lightweight JavaScript objects.
+
+React is then able to take these JavaScript objects and from them form a "virtual DOM" or a JavaScript representation of the actual DOM. This creates a win/win situation where you get the accessibility of templates with the power of JavaScript.
+
+Looking at the example below, this is what your JSX is transformed to once webpack runs its transformation process.
+
+```js
+class HelloWorld extends React.Component {
+  render() {
+    return React.createElement("div", null, "Hello World");
+  }
+}
+```
+
+Up until this point we haven’t really emphasized the importance of this new "virtual DOM" paradigm we’re jumping into. The reason the React team went with this approach is because, since the virtual DOM is a JavaScript representation of the actual DOM, React can keep track of the difference between the current virtual DOM (computed after some data changes), with the previous virtual DOM (computed before some data changes). React then isolates the changes between the old and new virtual DOM and then only updates the real DOM with the necessary changes. Read more about it in [React Elements vs React Components](https://tylermcginnis.com/react-elements-vs-react-components/)
+
+In more layman’s terms, because manipulating the actual DOM can be complex, React is able to minimize manipulations to the actual DOM by keeping track of a virtual DOM and only updating the real DOM when necessary and with only the necessary changes. Typically UI’s have lots of state which makes managing state difficult. By re-rendering the virtual DOM every time any state change occurs, React makes it easier to think about what state your application is in.
+
+The process looks something like this,
+
+Signal to notify our app some data has changed→ Re-render virtual DOM -> Diff previous virtual DOM with new virtual DOM -> Only update real DOM with necessary changes.
+
+### 5.2 Element vs Component
+See full article [React Elements vs React Components](https://tylermcginnis.com/react-elements-vs-react-components/).
+
+What is React?
+
+> React is a library for building user interfaces. No matter how complex React or the React ecosystem seem to be, this is React at its core — building UIs.
+
+What is an **Element**?
+
+> Simply put, a React element describes what you want to see on the screen. Not so simply put, a React element is an object representation of a DOM node.
+
+It’s important to note that a React element isn’t actually the thing you’ll see on your screen, instead, it’s just an object representation of it. There’s a few reasons for this. 
+
+The first is that JavaScript objects are lightweight — React can create and destroy these elements without too much overhead.
+
+The second reason is React is able to analyze the object, diff it with the previous object representation to see what changed, and then update the actual DOM only where those changes occurred. This has some performance upsides to it.
+
+**React element**
+
+```js
+const element = React.createElement(
+  'div',
+  {id: 'login-btn'},
+  'Login'
+)
+```
+
+What is a **Component**?
+
+> A component is a function or a Class which optionally accepts input and returns a React element.
+
+What happens with JSX?
+
+> JSX is always going to get transpiled to React.createElement invocations (typically) via Babel.
+ -->
