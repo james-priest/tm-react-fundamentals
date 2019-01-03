@@ -1056,4 +1056,6 @@ This will open your JSON config file. From there add in the following for automa
 }
 ```
 
+#### Before & After
+
 [![Before After](./assets/images/12-small.jpg)](./assets/images/12.jpg)
