@@ -852,6 +852,8 @@ What happens with JSX?
 ### 6.1 What this solves
 I wanted to set up linting and code formatting in VS Code so I could follow good coding practices from the beginning.
 
+[![Linting](./assets/images/11-small.jpg)](./assets/images/11.jpg)
+
 In my research I found that most people seem to be using a combination of ESLint, Airbnb, and Prettier to achieve this. Here's what each does.
 
 - **ESLint** highlights errors and formats code accoriding to a set of rules
@@ -1053,3 +1055,5 @@ This will open your JSON config file. From there add in the following for automa
     "eslint.autoFixOnSave": true,
 }
 ```
+
+[![Before After](./assets/images/12-small.jpg)](./assets/images/12.jpg)
