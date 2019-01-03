@@ -847,3 +847,209 @@ What is a **Component**?
 What happens with JSX?
 
 > JSX is always going to get transpiled to React.createElement invocations (typically) via Babel.
+
+## 6. ESLint, Airbnb, & Prettier
+### 6.1 What this solves
+I wanted to set up linting and code formatting in VS Code so I could follow good coding practices from the beginning.
+
+In my research I found that most people seem to be using a combination of ESLint, Airbnb, and Prettier to achieve this. Here's what each does.
+
+- **ESLint** highlights errors and formats code accoriding to a set of rules
+- **Airbnb** provides an opinionated set of rules for code quality and style
+- **Prettier** formats code according to it's own simple set of rules
+
+The difficult part was trying to determine which packages, plugins, & configurations to use. I spent a week trying different recipes and configurations until I found a working solution.
+
+I'm documenting this here so I can reference it later if need be.
+
+> **Note:** I wanted to install these packages globally to avoid having to do a separate local installation each time I started a new project.
+>
+> This global approach wasn't the best one for a couple reasons.
+> 1. A global install caused some libraries to not work well with one another. Some package combinations worked while others did not.
+> 2. It's usually best to include the libraries as part of the project so anyone else who clones and works on it will have the benefit of this configuration.
+
+### 6.2 Tools explained
+
+Here are a quick explanation of these tools.
+
+**Prettier & ESLint explained**
+
+- **Prettier** ([https://prettier.io](https://prettier.io/docs/en/index.html)) formats your code and nothing more. It's opinionated and therefore only has a few configurable formatting rules (single or double quotes, semi colon or not, line-endings, etc.). It will reformat your code but does not help with code quality.
+- **ESLint** ([https://eslint.org](https://eslint.org/docs/user-guide/getting-started)) handles both code quality AND code formatting (depending on which rules or Style Guide you use). If you use Prettier then you should turn off ESLint's formatting rules and just rely on code quality rules. Some of the config packages we use will do this automatically.
+- **Airbnb** ([https://github.com/airbnb/javascript](https://github.com/airbnb/javascript)) Provides a set of code style rules from which to work. This covers possible errors, best practices, and stylistic choices.
+
+**VSCode Extensions**
+
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - This integrates ESLint syntax highlighting into VSCode. The *eslint* npm package needs to be installed and configured separate from the VSCode extension.
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - This extension isn't used in our VSCode setup since we'll configure Prettier to run from within ESLint with the help of an eslint plugin package. Also, relying on this extension to integrate with ESLint introduced a host of other issues such as formatting conflicts with VSCode's built in formatter.
+
+**Npm Packages**
+
+To begin with, both [ESLint](https://eslint.org) and [Prettier](https://prettier.io/) npm package libraries must be installed.
+
+- [eslint](https://github.com/eslint/eslint) - core package which the VSCode extension relies on. It highlights errors and can be used to fix/format code from the CLI with `eslint --fix`.
+- [prettier](https://github.com/prettier) - code formatting package that eslint uses. It can also format code on the CLI with `prettier --write`.
+
+Here are the npm packages I used for ESLint & Prettier:
+
+- [babel-eslint](https://github.com/babel/babel-eslint) - a wrapper for Babel's parser required by *eslint-plugin-react*.
+- [eslint-config-airbnb](https://www.npmjs.com/package/eslint-config-airbnb) - This provides Airbnb's rules for ESLint.
+- [eslint-config-prettier](https://github.com/prettier/eslint-config-prettier) - Turns off ESLint formatting rules that conflict with Prettier.
+- [eslint-plugin-import](https://www.npmjs.com/package/eslint-config-airbnb) - provides linting and rules around ES2015 import/export syntax.
+- [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) - react specific linting rules for ESLint.
+- [eslint-plugin-jsx-a11y](https://github.com/evcohen/eslint-plugin-jsx-a11y) - accessibility rules checker on JSX elements for ESLint.
+- [eslint-plugin-react-native](https://github.com/Intellicode/eslint-plugin-react-native) - React Native specific linting rules for ESLint.
+- [eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier) - ESLint plugin to add Prettier formatting. This runs ESLint followed by Prettier. Use this to integrate Prettier with ESLint workflow and end up with Prettier formatted code. Requires *eslint* & *prettier*.
+
+The following packages also provide formatting but done in a different way. If you want ESLint to apply its rules AFTER Prettier has formatted the code then you can use the packages below.
+
+These format your JavaScript using Prettier FIRST, followed by ESLint SECOND. (Code -> prettier -> eslint -> formatted code). These two package libraries work best for CLI formatting.
+
+- [prettier-eslint](https://github.com/prettier/prettier-eslint) - Use this if you want to apply ESLint's code formatting to the output of Prettier formatted code.
+- [prettier-eslint-cli](https://github.com/prettier/prettier-eslint-cli) - The CLI version of *prettier-eslint*. This works on files. *prettier-eslint* operates on strings.
+
+### 6.3 Articles & Reference
+These are the videos, articles, and walk-throughs I used for reference.
+
+- YouTube - [How to Setup VS Code + Prettier + ESLint](https://www.youtube.com/watch?v=YIvjKId9m2c) - Wes Bos<br>
+  - Referenced [Wes Bos Dot files](https://github.com/wesbos/dotfiles) on GitHub (.eslintrc & .vscode)
+- Medium - [Integrating Prettier + ESLint + Airbnb Style Guide in VSCode](https://blog.echobind.com/integrating-prettier-eslint-airbnb-style-guide-in-vscode-47f07b5d7d6a) - Jeffrey Zhen.<br>
+  Wes Bos config. Works with global or local packages. Must set these VSCode settings.
+  - "beautify.language": { "js": [] }
+  - "eslint.autoFixOnSave": true
+- freeCodeCamp - [How to integrate Prettier with ESLint and stylelint](https://medium.freecodecamp.org/integrating-prettier-with-eslint-and-stylelint-99e74fede33f) - Abhishek Jain.<br>
+  Uses *prettier-eslint* & *prettier-stylelint* to create npm scripts for linting all existing code at once.
+- Blog post - [A Prettier JavaScript Formatter](https://jlongster.com/A-Prettier-Formatter) - James Long<br>
+  Describes how Prettier works with AST formatting.
+- Medium - [Javascript Linting and Formatting with ESLint, Prettier, and Airbnb](https://medium.com/@joshuacrass/javascript-linting-and-formatting-with-eslint-prettier-and-airbnb-30eb746db862) - Joshua Crass<br>
+  Great article on setting up React rules, webpack aliases, ignore files, and pre-commit hooks using Husky.
+- Blog Post - [How to Setup ESLint and Prettier in VSCode For React Project](https://www.lvguowei.me/post/vscode-eslint-prettier/)<br>
+  This shows a good example of VSCode editor config so you can turn off conflicting auto formating.
+
+### 6.4 JavaScript Style Guides
+Here are a few style guides for reference.
+
+- [ESLint Recommended](https://eslint.org/docs/rules/) - default rule set used with `eslint:recommended`.
+- [Airbnb](https://github.com/airbnb/javascript) - A more opinionated style guide for writing Javascript.
+- [Standard Style](https://standardjs.com/rules.html) - The style guide that eliminates semis.
+
+Here's a link to the Awesome ESLint GitHub repo. It is a good jump off point for configs, parsers, plugins, and style guides.
+
+- [https://github.com/dustinspecker/awesome-eslint](https://github.com/dustinspecker/awesome-eslint)
+
+### 6.5 React Starter App
+I put this up on a repo so I can easily clone and go.
+
+- [https://github.com/james-priest/react-starter-app](https://github.com/james-priest/react-starter-app)
+
+#### Installation scripts
+I also created a set of scripts to get everything installed properly.
+
+These are:
+
+- **install-airbnb** - Installs eslint & airbnb style guide rules
+- **install-prettier** - Installs prettier code formatting
+- **install-react** - Installs react and react-dom
+- **install-dev-env** - Install babel, webpack, & loaders
+- **eslint-check** - Checks for custom rule conflicts with Prettier's formatting
+- **build** - Builds the React app
+- **start** - Starts the webpack dev server
+
+```js
+// packages.json
+{
+  "name": "React App",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  },
+  "scripts": {
+    "install-airbnb": "npx install-peerdeps --dev eslint-config-airbnb",
+    "install-prettier": "npm i -D prettier eslint-config-prettier eslint-plugin-prettier",
+    "install-react": "npm i --save react react-dom",
+    "install-dev-env": "npm i -D @babel/core @babel/preset-env @babel/preset-react webpack webpack-cli webpack-dev-server babel-loader css-loader style-loader html-webpack-plugin",
+    "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+```
+
+Depending on which branch is being used you may not need to run these.
+
+#### ESLint config
+These is the ESLint configuration file along with a set of custom ruless.
+
+```js
+// eslintrc.js
+module.exports = {
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "extends": [
+    "airbnb",
+    "plugin:react/recommended",
+    "plugin:jsx-a11y/recommended",
+    "prettier",
+    "prettier/react"
+  ],
+  "plugins": [
+    "react",
+    "jsx-a11y",
+    "prettier"
+  ],
+  "rules": {
+    "func-names": "off",
+    "linebreak-style": "off",
+    "no-console": "off",
+    "prefer-const": [
+      "error",
+      {
+        "destructuring": "all",
+      }
+    ],
+    "prettier/prettier": ["error"],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
+      }
+    ],
+    "react/prefer-stateless-function": 0
+  }
+};
+```
+
+#### VSCode config
+Here are the changes I made to User config
+
+Open Command Palette...(Ctrl/Cmd+Shift+P), then type: Preferences: Open Settings (JSON).
+
+This will open your JSON config file. From there add in the following for automatic code format on save.
+
+```json
+{
+    "eslint.alwaysShowStatus": true,
+    "eslint.autoFixOnSave": true,
+}
+```
