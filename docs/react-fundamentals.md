@@ -1059,3 +1059,218 @@ This will open your JSON config file. From there add in the following for automa
 #### Before & After
 
 [![Before After](./assets/images/12-small.jpg)](./assets/images/12.jpg)
+
+## 7. Dataflow with Props
+### 7.1 Props explained
+In this section we discuss how to pass information to our components, just as we'd pass information to a function via arguments.
+
+- React is very good at managing state
+- The system for passing data from one component to another child component is through *props*
+- Props are to component what arguments are to functions
+
+```jsx
+class HelloUser extends React.Component {
+  render() {
+    return (
+      <div> Hello, {this.props.name}</div>
+    )
+  }
+}
+ReactDOM.render(<HelloUser name="James"/>, document.getElementById('app'));
+```
+
+When we use the component, we're passing in a `name` attribute. This attribute can then be accessed inside the component as `this.props.name`.
+
+### 7.2 Practicing Props
+The following three exercises create the same badge app. Each exercise incorporates a more advanced and modular design.
+
+The exercises ask you to pass down the correct props and render the components.
+
+- [Exercise 1 on CodePen](http://codepen.io/tylermcginnis/pen/RpvEvL)
+- [Exercise 2 on CodePen](http://codepen.io/tylermcginnis/pen/NpoezB)
+- [Exercise 3 on CodePen](http://codepen.io/tylermcginnis/pen/OpdreE)
+
+The final result will look like this.
+
+[![Badge App](./assets/images/13-small.jpg)](./assets/images/13.jpg)
+
+#### Solution 1
+
+```jsx
+const React = require('react');
+const ReactDOM = require('react-dom');
+
+class Badge extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Badge 1</h1>
+        <img src={this.props.img} alt="" />
+        <h2>Name: {this.props.name}</h2>
+        <h3>Username: {this.props.username}</h3>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Badge
+    name="James Priest"
+    username="james-priest"
+    img="https://avatars1.githubusercontent.com/u/27903822?s=460&v=4"
+  />,
+  document.getElementById('app')
+);
+```
+
+Here's the Badge component using destructuring assignment for props.
+
+```jsx
+class Badge extends React.Component {
+  render() {
+    const { name, username, img } = this.props;
+    return (
+      <div>
+        <h1>Badge 1</h1>
+        <img src={img} alt="" />
+        <h2>Name: {name}</h2>
+        <h3>Username: {username}</h3>
+      </div>
+    );
+  }
+}
+```
+
+#### Solution 2
+
+```jsx
+const React = require('react');
+const ReactDOM = require('react-dom');
+
+const USER_DATA = {
+  name: 'James Priest',
+  img: 'https://avatars1.githubusercontent.com/u/27903822?s=460&v=4',
+  username: 'james-priest'
+};
+
+class Badge extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Badge 2</h1>
+        <img src={this.props.user.img} alt="" />
+        <h2>Name: {this.props.user.name}</h2>
+        <h3>Username: {this.props.user.username}</h3>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<Badge user={USER_DATA} />, document.getElementById('app'));
+```
+
+Solution 2 with destructuring assignment...
+
+```jsx
+class Badge extends React.Component {
+  render() {
+    const { user } = this.props;
+    return (
+      <div>
+        <h1>Badge 2</h1>
+        <img src={user.img} alt="" />
+        <h2>Name: {user.name}</h2>
+        <h3>Username: {user.username}</h3>
+      </div>
+    );
+  }
+}
+```
+
+#### Solution 3
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+class Avatar extends React.Component {
+  render() {
+    return <img src={this.props.img} alt="profile" />;
+  }
+}
+
+class Label extends React.Component {
+  render() {
+    return <h2>{this.props.name}</h2>;
+  }
+}
+
+class ScreenName extends React.Component {
+  render() {
+    return <h3>Username: {this.props.user}</h3>;
+  }
+}
+
+class Badge extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Badge 3</h1>
+        <Avatar img={this.props.user.img} />
+        <Label name={this.props.user.name} />
+        <ScreenName user={this.props.user.username} />
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Badge{% raw %}
+    user={{
+      img: 'https://avatars1.githubusercontent.com/u/27903822?s=460&v=4',
+      name: 'James Priest',
+      username: 'james-priest'
+    }}{% endraw %}
+  />,
+  document.getElementById('app')
+);
+```
+
+Solution 3 with destructuring
+
+```jsx
+class Avatar extends React.Component {
+  render() {
+    const { img } = this.props;
+    return <img src={img} alt="profile" />;
+  }
+}
+
+class Label extends React.Component {
+  render() {
+    const { name } = this.props;
+    return <h2>{name}</h2>;
+  }
+}
+
+class ScreenName extends React.Component {
+  render() {
+    const { user } = this.props;
+    return <h3>Username: {user}</h3>;
+  }
+}
+
+class Badge extends React.Component {
+  render() {
+    const { user } = this.props;
+    return (
+      <div>
+        <h1>Badge 3</h1>
+        <Avatar img={user.img} />
+        <Label name={user.name} />
+        <ScreenName user={user.username} />
+      </div>
+    );
+  }
+}
+```
