@@ -1097,9 +1097,6 @@ The final result will look like this.
 #### Solution 1
 
 ```jsx
-const React = require('react');
-const ReactDOM = require('react-dom');
-
 class Badge extends React.Component {
   render() {
     return (
@@ -1144,9 +1141,6 @@ class Badge extends React.Component {
 #### Solution 2
 
 ```jsx
-const React = require('react');
-const ReactDOM = require('react-dom');
-
 const USER_DATA = {
   name: 'James Priest',
   img: 'https://avatars1.githubusercontent.com/u/27903822?s=460&v=4',
@@ -1190,9 +1184,6 @@ class Badge extends React.Component {
 #### Solution 3
 
 ```jsx
-import React from 'react';
-import ReactDOM from 'react-dom';
-
 class Avatar extends React.Component {
   render() {
     return <img src={this.props.img} alt="profile" />;
@@ -1274,3 +1265,248 @@ class Badge extends React.Component {
   }
 }
 ```
+
+### 7.3 Lists with map & filter
+If you're coming from an Angular background, you're familiar with the idea of '**ng-repeat**'. With React, you can just use JavaScript's native `.map` property.
+
+`.map` allows you to "map" over an array, modify each item in that array, and returns a new array after each item in the array has been modified.
+
+Here's an example of "mapping over" numbers in an array and adding 10 to each item before returning a new array.
+
+```js
+var numbers = [1,2,3];
+var numbersPlusTen = numbers.map(function(num) {
+  return num = 10;
+});
+console.log(numbersPlusTen) // [11, 12, 13]
+```
+
+The following is how to use map to build a list for our UI in React.
+
+We are going to have a parent and a child component. The parent will pass down data to the child as props.
+
+```jsx
+// parent
+class FriendsContainer extends React.Component {
+  render() {
+    var name = 'Tyler McGinnis';
+    var friends = ['Ean Platter', 'Murphy Randall', 'Merrick Christensen'];
+    return (
+      <div>
+        <h3> Name: {name} </h3>
+        <ShowList names={friends} />
+      </div>
+    )
+  }
+}
+```
+
+Here's the child component.
+
+```jsx
+class ShowList extends React.Component {
+  render() {
+    return (
+      <div>
+        <h3> Friends </h3>
+        <ul>
+          {this.props.names.map(function(friend){
+            return <li> {friend} </li>;
+          })}
+        </ul>
+      </div>
+    )
+  }
+}
+```
+
+Remember that the code that gets returned from our render method is a representation of what the real DOM should look like.
+
+All map does is it creates a new array, calls our callback function on each item in the array, and fills the new array with the result of calling the callback function on each item. For example,
+
+```js
+var friends = ['Ean', 'John', 'Jane'];
+var listItems = friends.map(function(friend){
+  return "<li>" + friend + "</li>";
+});
+console.log(listItems); // ["<li>Ean</li>", "<li>John</li>", "<li>Jane</li>"];
+```
+
+So in our child component above, we’re mapping over names, wrapping each name in a pair of `<li>` tags, and saving that to our listItems variable. Then, our render method returns an unordered list with all of our friends.
+
+`.filter` is similar to `.map` but instead of returning a new array after you've modified each item in the array, `.filter` allows you to filter out certain items in an array.
+
+For example, let's say one day we decided that we only wanted to have friends whose name started with 'J'. With filter, that would look like this,
+
+```js
+var friends = var friends = ['Ean', 'John', 'Jane'];
+var newFriends = friends.filter(function(friend) {
+  return friend[0] = 'J';
+});
+console.log(newFriends); // ['John', 'Jane']
+```
+
+### 7.4 Practicing map & filter
+Here are two practice exercises.
+
+- [Exercise 4 on CodePen](http://codepen.io/tylermcginnis/pen/peGGzX)
+- [Exercise 5 on CodePen](http://codepen.io/tylermcginnis/pen/mWoVJE/)
+
+#### Solution 4 - map
+This code simply maps over an array of names and outputs the name value.
+
+```jsx
+class Users extends React.Component {
+  render() {
+    const { list } = this.props;
+    return (
+      <ul>
+        {list.map(name => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Users list={['Tyler', 'Mikenzi', 'Ryan', 'Michael']} />,
+  document.getElementById('app')
+);
+```
+
+[![Map](./assets/images/14-small.jpg)](./assets/images/14.jpg)
+
+#### Solution 5 - filter & map
+This exercise uses chaining to take the results of `.filter` and chain to `.map` for the iteration.
+
+```jsx
+class Users extends React.Component {
+  render() {
+    const { list } = this.props;
+    return (
+      <div>
+        <h1>Friends</h1>
+        <ul>
+          {list
+            .filter(person => person.friend === true)
+            .map(person => (
+              <li key={person.name}>{person.name}</li>
+            ))}
+        </ul>
+        <hr />
+        <h1>Non Friends</h1>
+        <ul>
+          {list
+            .filter(person => person.friend === false)
+            .map(person => (
+              <li key={person.name}>{person.name}</li>
+            ))}
+        </ul>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Users
+    list={[
+      { name: 'Tyler', friend: true },
+      { name: 'Ryan', friend: true },
+      { name: 'Michael', friend: false },
+      { name: 'Mikenzi', friend: false },
+      { name: 'Jessica', friend: true },
+      { name: 'Dan', friend: false }
+    ]}
+  />,
+  document.getElementById('app')
+);
+```
+
+[![Filter](./assets/images/15-small.jpg)](./assets/images/15.jpg)
+
+An alternate way to code this without inlining all the filtering and mapping is to filter the results into `friends` and `nonFriends` variables and then just map through each.
+
+```jsx
+class Users extends React.Component {
+  render() {
+    const { list } = this.props;
+    const friends = list.filter(user => user.friend === true);
+    const nonFriends = list.filter(user => user.friend === false);
+    return (
+      <div>
+        <h1>Friends</h1>
+        <ul>
+          {friends.map(person => (
+            <li key={person.name}>{person.name}</li>
+          ))}
+        </ul>
+
+        <hr />
+
+        <h1>Non Friends</h1>
+        <ul>
+          {nonFriends.map(person => (
+            <li key={person.name}>{person.name}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+```
+
+#### Twitter Friends - map
+This uses both a parent and child component. The child component maps through a props array passed from the parent.
+
+```jsx
+class FriendsContainer extends React.Component {
+  render() {
+    const name = 'James Priest';
+    const friends = ['Evi', 'Joeylene', 'Brittany', 'Anusha', 'Divya'];
+    const containerStyle = {
+      border: '1px solid blue',
+      padding: '10px'
+    };
+    return (
+      <div style={containerStyle}>
+        <h3>Name : {name}</h3>
+        <ShowList names={friends} />
+      </div>
+    );
+  }
+}
+
+class ShowList extends React.Component {
+  render() {
+    const { names } = this.props;
+    const listStyle = {
+      border: '1px solid red',
+      padding: '10px'
+    };
+    return (
+      <div style={listStyle}>
+        <h3>Twitter Friends</h3>
+        <ul>
+          {names.map(friend => (
+            <li key={friend}>{friend}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<FriendsContainer />, document.getElementById('app'));
+```
+
+The parent component is outlined in blue and the child component is outlined in red.
+
+[![Twitter friends](./assets/images/16-small.jpg)](./assets/images/16.jpg)
+
+#### Using a key
+In each of the solutions above we added a `key` to the array item. This key serves as a unique identifier.
+
+What that does is it helps React identify which items have changed, added, or removed from a specific array.
+
+It's required for React to properly be able to handle updating of the data.
