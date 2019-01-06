@@ -578,7 +578,7 @@ module.exports = {
 ```
 
 #### 2. Transformations
-This tells webpack what transformations to make. This is where **loaders** come in handy. We install these using `npm install --save-dev <pacakge-name>`.
+This tells webpack what transformations to make. This is where **loaders** come in handy. We install these using `npm install --save-dev <package-name>`.
 
 The loaders we'll be using are **babel-loader**, **style-loader**, and **css-loader**.
 
@@ -856,7 +856,7 @@ I wanted to set up linting and code formatting in VS Code so I could follow good
 
 In my research I found that most people seem to be using a combination of ESLint, Airbnb, and Prettier to achieve this. Here's what each does.
 
-- **ESLint** highlights errors and formats code accoriding to a set of rules
+- **ESLint** highlights errors and formats code according to a set of rules
 - **Airbnb** provides an opinionated set of rules for code quality and style
 - **Prettier** formats code according to it's own simple set of rules
 
@@ -988,7 +988,7 @@ These are:
 Depending on which branch is being used you may not need to run these.
 
 #### ESLint config
-These is the ESLint configuration file along with a set of custom ruless.
+These is the ESLint configuration file along with a set of custom rules.
 
 ```js
 // eslintrc.js
@@ -1510,3 +1510,435 @@ In each of the solutions above we added a `key` to the array item. This key serv
 What that does is it helps React identify which items have changed, added, or removed from a specific array.
 
 It's required for React to properly be able to handle updating of the data.
+
+## 8. Composition
+### 8.1 Functional Composition
+You're probably familiar with functions; when to use and when not to use them.
+
+We're going to take that same intuition about functions and use it for when to create new React components. Instead of taking in some arguments and returning a value, your function is going to take in some arguments and return some UI.
+
+The idea can be summed up with the following:
+
+> A Function takes in some Data and returns a View
+> - f(d)=V
+
+This is a beautiful way to think about developing user interfaces. Now your UI is just composed of different function invocations, which is how you're already used to building applications.
+
+Here's some sample code:
+
+```js
+var getProfilePic = function (username) {
+  return 'https://photo.fb.com/' + username
+}
+var getProfileLink = function (username) {
+  return 'https://www.fb.com/' + username
+}
+var getProfileData = function (username) {
+  return {
+    pic: getProfilePic(username),
+    link: getProfileLink(username)
+  }
+}
+getProfileData('tylermcginnis')
+```
+
+We have three functions and one function invocation. The code is clean and organized because we've separated everything out into different functions.
+
+Each function has a specific purpose and we're composing our functions by having one function `getProfileData` which leverages the other two functions `getProfilePic` and `getProfileLink`.
+
+Now when we invoke `getProfileData` we'll get an object back which represents our user.
+
+### 8.2 UI Composition
+Now what I want to do is instead of having those functions return some value, let's modify them a bit to return some UI (in the form of JSX).
+
+Here you'll really see the beauty of React's **render** method.
+
+```jsx
+class ProfilePic extends React.Component {
+  render() {
+    const { username } = this.props;
+    return <img src={`https://photo.fb.com/${username}`} alt="" />;
+  }
+}
+
+class ProfileLink extends React.Component {
+  render() {
+    const { username } = this.props;
+    return <a href={`https://www.fb.com/${username}`}>{username}</a>;
+  }
+}
+
+class Avatar extends React.Component {
+  render() {
+    const { username } = this.props;
+    return (
+      <div>
+        <ProfilePic username={username} />
+        <ProfileLink username={username} />
+      </div>
+    );
+  }
+}
+<Avatar username="james-priest" />
+```
+
+Now, instead of composing functions to get some value, we're composing functions to get some UI.
+
+This idea is so important in React that React 0.14 introduced Stateless Functional Components which allows the code above to be written as normal functions.
+
+```jsx
+const ProfilePic = function(props) {
+  const { username } = props;
+  return <img src={`#${username}`} alt="" />;
+};
+
+const ProfileLink = function(props) {
+  const { username } = props;
+  return <a href={`https://www.fb.com/${username}`}>{username}</a>;
+};
+
+const Avatar = function(props) {
+  const { username } = props;
+  return (
+    <div>
+      <h3>Stateless Functional Components</h3>
+      <ProfilePic username={username} />
+      <ProfileLink username={username} />
+    </div>
+  );
+};
+<Avatar username="james-priest" />
+```
+
+<!--
+### 8.3 Pure Functions
+One thing each of the functions and components above has in common is they're all "pure functions".
+
+Perhaps one of my favorite things about React is it's given me a light introduction to functional programming (FP) and a fundamental piece of FP are pure functions.
+
+The whole concept of a pure function is consistency and predictability (which IMO are keys to writing great software).
+
+The reason for the consistency and predictability is because pure functions have the following characteristics.
+
+- Pure functions always return the same result given the same arguments. 
+- Pure function's execution doesn't depend on the state of the application.
+- Pure functions don't modify the variables outside of their scope.
+
+When you call a function that is "pure", you can predict exactly what's going to happen based on its input. This makes functions that are pure easy to reason about and testable.
+
+Let's look at some examples.
+
+```js
+function add (x,y) {
+  return x + y
+}
+```
+
+Though simple, **add** is a pure function. There are no side effects. It will always give us the same result given the same arguments.
+
+Let's now look at two native JavaScript methods. `.slice` and `.splice`
+
+```js
+var friends = ['Ryan', 'Michael', 'Dan']
+friends.slice(0, 1) // 'Ryan'
+friends.slice(0, 1) // 'Ryan'
+friends.slice(0, 1) // 'Ryan'
+```
+
+Notice **.slice** is also a pure function. Given the same arguments, it will always return the same value. It's predictable.
+
+Let's compare this to .slice's friend, .splice
+
+```js
+var friends = ['Ryan', 'Michael', 'Dan']
+friends.splice(0, 1) // ["Ryan"]
+friends.splice(0, 1) // ["Michael"]
+friends.splice(0, 1) // ["Dan"]
+```
+
+**.splice** is not a pure function since each time we invoke it passing in the same arguments, we get a different result. It's also modifying state.
+
+Why is this important for React?
+
+Well the main reason is React's **render** method needs to be a pure function and because it's a pure function, all of the benefits of pure functions now apply to your UI as well.
+
+Another reason is that it's a good idea to get used to making your functions pure and pushing "side effects" to the boundaries of your program.
+
+I'll say this throughout the course, React will make you a better developer if you learn React the right way. Learning to write pure functions is the first step on that journey.
+
+### 8.4 PropTypes
+If you're coming from a strictly typed language, you know the importance of types.
+
+```jsx
+class Users extends React.Component {
+  render() {
+    const { list } = this.props;
+    return (
+      <ul>
+        {list.map(name => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Users list={['Tyler', 'Mikenzi', 'Ryan', 'Michael']} />,
+  document.getElementById('app')
+);
+```
+
+Looking at the component above, what would happen if when we rendered the component, instead of passing in list as an array, what if we accidentally passed in a string?
+
+```jsx
+<Users list="Tyler, Jake, Mikenzi" />
+```
+
+It would break because we're calling **list.map** in our component and strings don't have a **.map** method. This is where **PropTypes** come into play.
+
+#### PropTypes explained
+**PropTypes** allow you to declare the "type" (string, number, function, etc) of each prop being passed to a component. Then, if a prop passed in isn't of the declared type, you'll get a warning in the console.
+
+Here we passed in the number '23' as the last array element.
+
+```jsx
+ReactDOM.render(
+  <Users list={['Tyler', 'John', 'Ryan', 'Michael', 23]} />,
+  document.getElementById('app')
+);
+```
+
+The browser displays a warning because the type expected was an array of strings.
+
+[![PropTypes Error](./assets/images/17-small.jpg)](./assets/images/17.jpg)
+
+Here's what the PropTypes implementation looks like. We're specifying that `list` will be an array of strings and that the property is required.
+
+```jsx
+Users.propTypes = {
+  list: PropTypes.arrayOf(PropTypes.string).isRequired
+};
+```
+
+Here's the component code in it's entirety.
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+
+class Users extends React.Component {
+  render() {
+    const { list } = this.props;
+    return (
+      <ul>
+        {list.map(name => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+    );
+  }
+}
+
+Users.propTypes = {
+  list: PropTypes.arrayOf(PropTypes.string).isRequired
+};
+
+ReactDOM.render(
+  <Users list={['Tyler', 'Mikenzi', 'Ryan', 'Michael', 23]} />,
+  document.getElementById('app')
+);
+```
+
+In order to use PropTypes, you'll need to install them.
+
+> **Note:** PropTypes used to be included with React, but as of React 15.5 they were made they're own package which can be downloaded from npm as **prop-types**.
+
+#### PropTypes benefits
+PropTypes are great for finding bugs in your components but what I like most about them is their ability to add documentation to a component.
+
+When I look at a well written component, I can look at the render method to figure out what it's going to look like and I can look at its propTypes to figure out what it needs to accept to render properly.
+
+#### PropTypes gotchas
+To use PropTypes with **functions**, the API is **PropTypes.func** rather than PropTypes.function. Also to use **booleans**, the API is **PropTypes.bool** not PropTypes.boolean.
+
+I'm not 100% sure why but I assume it's because with ES6 you can use named imports to do
+
+```js
+var { array, object, number, function, boolean } = React.PropTypes
+```
+
+and both *function* and *boolean* are reserved words so that would break. Instead use **func** and **bool** and you'd be good.
+
+The PropTypes api is very in depth and you can do even more things than just type checking (like making a property required or type checking specific properties of an object).
+
+You can read more in the [React documentation: Typechecking With PropTypes](https://reactjs.org/docs/typechecking-with-proptypes.html).
+
+### 8.5 Practicing PropTypes
+#### PropTypes: string 
+The `propTypes` property of our Badge component will be set to an object with a key for each prop being passed to our component.
+
+Here's an example of the Badge component with PropTypes. 
+
+```jsx
+const React = require('react');
+const ReactDOM = require('react-dom');
+const PropTypes = require('prop-types');
+require('./style.css');
+
+class Badge extends React.Component {
+  render() {
+    const { img, name, username } = this.props;
+    return (
+      <div>
+        <h1>Badge 1</h1>
+        <img src={img} alt="" />
+        <h2>Name: {name}</h2>
+        <h3>Username: {username}</h3>
+      </div>
+    );
+  }
+}
+
+Badge.propTypes = {
+  name: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
+  img: PropTypes.string.isRequired
+};
+
+ReactDOM.render(
+  <Badge
+    name="James Priest"
+    username="james-priest"
+    img="https://avatars1.githubusercontent.com/u/27903822?s=460&v=4"
+  />,
+  document.getElementById('app')
+);
+```
+
+[![PropTypes](./assets/images/18-small.jpg)](./assets/images/18.jpg)
+
+If we change the img prop from a string to an object like this.
+
+```jsx
+{% raw %}
+ReactDOM.render(
+  <Badge
+    name="James Priest"
+    username="james-priest"
+    img={{
+      image: 'https://avatars1.githubusercontent.com/u/27903822?s=460&v=4'
+    }}
+  />,
+  document.getElementById('app')
+);
+{% endraw %}
+```
+
+Then we will get a console warning telling us about the issue.
+
+[![PropTypes error msg](./assets/images/19-small.jpg)](./assets/images/19.jpg)
+
+#### PropTypes: arrayOf and shape
+Looking at our Users component we can see `list` is an array of objects. Each object has two properties, and those properties are a string and a boolean.
+
+```jsx
+ReactDOM.render(
+  <Users
+    list={[
+      { name: 'Tyler', friend: true },
+      { name: 'Ryan', friend: true },
+      { name: 'Michael', friend: false },
+      { name: 'John', friend: false },
+      { name: 'Jessica', friend: true },
+      { name: 'Dan', friend: false }
+    ]}
+  />,
+  document.getElementById('app')
+);
+```
+
+Since `list` is an array we could start with this.
+
+```jsx
+Users.propTypes = {
+  list: PropTypes.array.isRequired
+};
+```
+
+We could then add this which stays our prop is an array of objects and the array is required.
+
+```jsx
+Users.propTypes = {
+  list: PropTypes.arrayOf(PropTypes.object).isRequired
+};
+```
+
+Lastly, we can define the whole structure and specify our array contains objects with a shape of string for name and boolean for friend and that both are required.
+
+It'll look like this.
+
+```jsx
+Users.propTypes = {
+  list: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      friend: PropTypes.bool.isRequired
+    })
+  ).isRequired
+};
+```
+
+If I happen to pass in a string in place of a boolean like this.
+
+```jsx
+ReactDOM.render(
+  <Users
+    list={[
+      { name: 'Tyler', friend: 'true' },
+      { name: 'Ryan', friend: true },
+      { name: 'Michael', friend: false },
+      { name: 'John', friend: false },
+      { name: 'Jessica', friend: true },
+      { name: 'Dan', friend: false }
+    ]}
+  />,
+  document.getElementById('app')
+);
+```
+
+Then we get an error like this.
+
+[![PropTypes error msg](./assets/images/20-small.jpg)](./assets/images/20.jpg)
+
+What's great about PropTypes is instead of having to go through the render method to figure out what's going on, you can just look at the PropTypes in order to understand how to use the component.
+
+Whenever you build a component, you'll **always** want to specify the PropTypes for that component.
+
+The reasons why are:
+
+- It's helpful to yourself and other developers down the line
+- It creates documentation
+- It'll warn you if you use it wrong.
+
+### 8.6 Quiz
+Select the characteristics of a pure function.
+
+- [x] Doesn't depend on variables outside its scope
+- [x] Doesn't modify variables outside it's scope
+- [ ] Doesn't contain other function invocations
+- [x] Doesn't make Ajax Requests
+- [x] Doesn't manipulate the DOM
+
+You should treat props to a component as immutable
+
+- [x] true
+- [ ] false
+
+You should always add PropType validation to your component if that component is accepting props.
+
+- [x] true
+- [ ] false
+
+-->
