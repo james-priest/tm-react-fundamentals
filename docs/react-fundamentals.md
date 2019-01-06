@@ -1610,7 +1610,6 @@ const Avatar = function(props) {
 <Avatar username="james-priest" />
 ```
 
-<!--
 ### 8.3 Pure Functions
 One thing each of the functions and components above has in common is they're all "pure functions".
 
@@ -1666,6 +1665,7 @@ Another reason is that it's a good idea to get used to making your functions pur
 
 I'll say this throughout the course, React will make you a better developer if you learn React the right way. Learning to write pure functions is the first step on that journey.
 
+<!--
 ### 8.4 PropTypes
 If you're coming from a strictly typed language, you know the importance of types.
 
