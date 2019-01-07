@@ -1940,7 +1940,7 @@ You should always add PropType validation to your component if that component is
 - [x] true
 - [ ] false
 
-## 9. The 'this' keywords
+## 9. The 'this' keyword
 ### 9.1 Four types of binding
 The 'this' keyword is probably one of the most misunderstood aspects of JavaScript.
 
