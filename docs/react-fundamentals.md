@@ -1939,3 +1939,361 @@ You should always add PropType validation to your component if that component is
 
 - [x] true
 - [ ] false
+
+## 9. The 'this' keywords
+### 9.1 Four types of binding
+The 'this' keyword is probably one of the most misunderstood aspects of JavaScript.
+
+The first thing to understand regarding `this` keyword is to understand its purpose, or what it is that 'this' keyword allows us to do in JavaScript.
+
+- It allows us reuse functions with different contexts
+- It allows us to decide which objects should be focal when invoking a function or a method.
+
+There are 4 rules for the `this` keyword
+
+1. Implicit Binding
+2. Explicit Binding
+3. new Binding
+4. window Binding
+
+The first thing we need to ask  when using `this` keyword is
+
+> Where is this function invoked?
+
+Because whenever you're trying to find out what `this` keyword is you have to look at **when the function was invoked**... not when it was defined, but specifically when it was invoked.
+
+Let's say we had a function here called sayName that took in a name argument.
+
+```js
+var sayName = function(name){
+ console.log('Hello', name);
+};
+```
+
+If we were to ask what `name` is at this point we wouldn't know until the function is invoked.
+
+```js
+sayName('James'); // now we know that name is 'James'
+```
+
+The same holds true for the `this` keyword.
+
+> We won't know what `this` keyword is in a function until that function is invoked.
+
+Now let's look at the first rule of implicit binding.
+
+### 9.2 Implicit Binding
+Implicit Binding is the most common rule and will be found in about 80% of use cases when trying to figure out what `this` is.
+
+#### Example 1
+
+```js
+// Implicit Binding
+// Left of the Dot at Call Time
+var me = {
+  name: 'James',
+  age: 48,
+  sayName: function() {
+    console.log(this.name);
+  }
+};
+
+me.sayName();
+```
+
+Implicit Binding says that in order to find the `this` keyword we look to the left of the dot of the function invocation. That's what the `this` keyword is going to reference.
+
+```js
+me.sayName();
+```
+
+In the code above, we see the `sayName()` invocation and look to the left of the dot. The `me` object is what `this` references.
+
+#### Example 2
+
+```js
+// Implicit Binding
+// Left of the Dot at Call Time
+var sayNameMixin = function(obj){
+  obj.sayName = function(){
+    console.log(this.name);
+  }
+}
+
+var me = {
+  name: 'james',
+  age: 48
+};
+
+var you = {
+  name: 'evi',
+  age: 24
+}
+
+sayNameMixin(me);
+sayNameMixin(you);
+```
+
+When we pass both of these objects into our mixin it decorates them with a new `sayName()` property.
+
+Then when we invoke each we look to the left of the dot to see what `this` references.
+
+```js
+me.sayName(); // james
+you.sayName(); // evi
+```
+
+#### Example 3
+
+```js
+// Implicit Binding
+// Left of the Dot at Call Time
+var Person = function(name, age) {
+  return {
+    name: name,
+    age: age,
+    sayName: function() {
+      console.log(this.name);
+    }
+  }
+}
+
+var jim = Person('jim', 42);
+jim.sayName(); // jim
+```
+
+But what if we made this a bit more complex.
+
+```js
+// Implicit Binding
+// Left of the Dot at Call Time
+var Person = function(name, age) {
+  return {
+    name: name,
+    age: age,
+    sayName: function() {
+      console.log(this.name);
+    },
+    mother: {
+      name: 'Susan',
+      sayName: function(){
+        console.log(this.name);
+      }
+    }
+  }
+}
+
+var jim = Person('jim', 42);
+jim.sayName(); // jim
+jim.mother.sayName() // Susan
+```
+
+Once again we look to the left of the dot of the function invocation to get the object `this` refers to.
+
+This seems deceptively easy, and because it is very straight-forward, whenever you get into situations where you need to find out what `this` is, the very first thing you should do is look at when the function was invoked and then look to the left of that function to find out what `this` is referencing.
+
+### 9.3 Explicit Binding
+Uses **call**, **apply**, or **bind**.
+
+In previous example we can called `sayName()` method on the `stacey` object.
+
+```js
+// Implicit Binding
+// Left of the Dot at Call Time
+var stacey = {
+  name: 'Stacey',
+  age: 34,
+  sayName: function(){
+    console.log('My name is ' + this.name);
+  }
+};
+
+stacey.sayName()
+```
+
+ We look to the left of the dot to find that `stacey` is object that called the method to see what `this` refers to.
+
+#### Example 1 - call
+
+Let's change things around so that `sayName` is just a function on the global scope but what we want to do is still call the function in the context of the `stacey` object.
+
+```js
+// Explicit Binding
+// call, apply, bind
+var sayName = function() {
+  console.log('My name is ' + this.name);
+}
+
+var stacey = {
+  name: 'Stacey',
+  age: 34
+}
+
+sayName.call(stacey)
+```
+
+What we can do is type the function name and then use the `call` method, which is available to every function, to do just that.
+
+The first argument that it takes in is the context that you want to call the function from.
+
+So now the `sayName` function is going to be invoked but the `this` keyword inside of `sayName` will now reference the `stacey` object.
+
+So in this example we're explicitly stating what the `this` keyword is when we use `call`. It is the very first argument we pass to `call`.
+
+> `.call()` provides a new value of **this** to the function/method.
+> 
+> With call, you can write a method once and then inherit it in another object, without having to rewrite the method for the new object.
+>
+> Additional arguments to the function are passed in one by one after the first argument.
+
+#### Example 2 - call with args
+Now if we want to pass a few more parameters to `sayName` we can do that.
+
+Let's create an array and then pass the array elements to the function.
+
+The very first argument in `.call()` is the context. Every argument after that will be passed to the function.
+
+```js
+// Explicit Binding
+// call, apply, bind
+var sayName = function(lang1, lang2, lang3) {
+  console.log(`My name is ${this.name}. I know ${lang1}, ${lang2}, ${lang3}.`);
+}
+
+var stacey = {
+  name: 'Stacey',
+  age: 34
+}
+
+var languages = ['JavaScrip', 'Ruby', 'Python'];
+
+// sayName.call(stacey, languages[0], languages[1], languages[2]);
+sayName.call(stacey, ...languages);
+```
+
+So, we are invoking `sayName` in the context of `stacey` and we are passing along three arguments.
+
+#### Example 3 - apply
+Next what we could do is rather than pass in the arguments one by one, we could pass them in as an array.
+
+```js
+sayName.apply(stacey, languages);
+```
+
+This is exactly what `.apply()` does. It allows us to pass in the arguments as an array.
+
+> `.apply()` provides a new value of **this** to the function/method.
+>
+> Instead of having to pass additional arguments one by one, you can pass them in as an array after context which is the first argument.
+
+#### Example 4 - bind
+The `.bind()` is almost the same thing as `.call()` except there's one thing that's different.
+
+What `.bind()` will do is return us a new function instead of invoking the original function.
+
+Looking at our code from before.
+
+```js
+// sayName.bind(stacey, languages[0], languages[1], languages[2]);
+var newFn = sayName.bind(stacey, ...languages);
+```
+
+Now, instead of invoking `sayName`, it's just going to bind `this` to `stacey`, pass in the languages arguments, and return a brand new function which we can call later.
+
+Now we can invoke the new function with `newFn();`.
+
+> #### Summary
+>
+> - **call**, **apply**, and **bind** allow us to explicitly state what the `this` keyword is going to be in any given function.
+> - **call** and **apply** behave in the exact same way. They will immediately invoke the function.
+> - **call** requires additional arguments to be passed in one by one
+> - **apply** allows you to pass in the arguments as an array
+> - **bind** is the same as **call** except that instead of immediately invoking the function it returns a brand new function that can be invoked later
+
+<!--
+### 9.4 new & window Binding
+Here we're going to talk about the last two rules when figuring out what `this` keyword is referencing.
+
+The first is **new** binding and the last one is **window** binding.
+
+#### Example 1 - new
+Here we have a function which has the first letter capitalized to express that this is going to be a constructor function which is going to be called with the **new** keyword.
+
+```js
+// new Binding
+var Animal = function(color, name, type) {
+  this.color = color;
+  this.name = name;
+  this.type = type;
+};
+
+var zebra = new Animal('black and white', 'Zorro', 'Zebra');
+```
+
+Because we're invoking this function with the **new** keyword, what happens behind the scenes is that JavaScript is going to create a brand new object and bind `this` to that new object.
+
+We can imagine it as this.
+
+```js
+var Animal = function(color, name, type) {
+  // this = {}
+  this.color = color;
+  this.name = name;
+  this.type = type;
+};
+```
+
+#### Example 2 - window
+
+```js
+// window Binding
+var sayAge = function() {
+  console.log(this.age);
+};
+
+var me = {
+  age: 48
+};
+```
+
+If we wanted to call `sayAge` in the context of `me` we'd have to do this.
+
+```js
+sayAge.call(me);
+```
+
+But if we don't do this but instead just call `sayAge` we get `undefined`.
+
+```js
+sayAge(); // undefined
+```
+
+The reason is if we invoke a function that uses the `this` keyword but doesn't have anything to the left of the dot, it's not using the **new** binding, and it's not using **call**, **apply**, or **bind**, then the `this` keyword is going to default to the `window` object.
+
+So if we decide to add a property of `age` to the window object we will get that result back.
+
+```js
+window.age = 35;
+sayAge(); // 35
+```
+
+Additionally, if we run the function in strict mode, JavaScript will return a TypeError if we try to access age without it being defined on the window object.
+
+```js
+var sayAge = function() {
+  'use strict';
+  console.log(this.age);
+};
+
+sayAge(); // TypeError: Cannot read property 'age' of undefined
+```
+
+### 9.5 Binding rules recap
+The four rules in a quick recap.
+
+- **Implicit Binding** - look to the left of the dot at call time
+- **Explicit Binding** - tells a function what the context of the `this` keyword is going to be using **call**, **apply**, or **bind**
+- **new Binding** - is whenever you have a function invoked with the **new** keyword where the `this` keyword is bound to the new object being constructed
+- **window Binding** - if none of the previous rules apply then the `this` keyword is going to default to the **window** object unless you're in strict mode in which case it will be `undefined`
+
+-->
