@@ -2210,7 +2210,6 @@ Now we can invoke the new function with `newFn();`.
 > - **apply** allows you to pass in the arguments as an array
 > - **bind** is the same as **call** except that instead of immediately invoking the function it returns a brand new function that can be invoked later
 
-<!--
 ### 9.4 new & window Binding
 Here we're going to talk about the last two rules when figuring out what `this` keyword is referencing.
 
@@ -2295,5 +2294,3 @@ The four rules in a quick recap.
 - **Explicit Binding** - tells a function what the context of the `this` keyword is going to be using **call**, **apply**, or **bind**
 - **new Binding** - is whenever you have a function invoked with the **new** keyword where the `this` keyword is bound to the new object being constructed
 - **window Binding** - if none of the previous rules apply then the `this` keyword is going to default to the **window** object unless you're in strict mode in which case it will be `undefined`
-
--->
