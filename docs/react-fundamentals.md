@@ -1619,7 +1619,7 @@ The whole concept of a pure function is consistency and predictability (which IM
 
 The reason for the consistency and predictability is because pure functions have the following characteristics.
 
-- Pure functions always return the same result given the same arguments. 
+- Pure functions always return the same result given the same arguments.
 - Pure function's execution doesn't depend on the state of the application.
 - Pure functions don't modify the variables outside of their scope.
 
@@ -1775,10 +1775,10 @@ The PropTypes api is very in depth and you can do even more things than just typ
 You can read more in the [React documentation: Typechecking With PropTypes](https://reactjs.org/docs/typechecking-with-proptypes.html).
 
 ### 8.5 Practicing PropTypes
-#### PropTypes: string 
+#### PropTypes: string
 The `propTypes` property of our Badge component will be set to an object with a key for each prop being passed to our component.
 
-Here's an example of the Badge component with PropTypes. 
+Here's an example of the Badge component with PropTypes.
 
 ```jsx
 const React = require('react');
@@ -1998,7 +1998,7 @@ var me = {
   }
 };
 
-me.sayName();
+me.sayName(); // James
 ```
 
 Implicit Binding says that in order to find the `this` keyword we look to the left of the dot of the function invocation. That's what the `this` keyword is going to reference.
@@ -2030,8 +2030,8 @@ var you = {
   age: 24
 }
 
-sayNameMixin(me);
-sayNameMixin(you);
+sayNameMixin(me); // james
+sayNameMixin(you); // evi
 ```
 
 When we pass both of these objects into our mixin it decorates them with a new `sayName()` property.
@@ -2108,7 +2108,7 @@ var stacey = {
   }
 };
 
-stacey.sayName()
+stacey.sayName() // Stacey
 ```
 
  We look to the left of the dot to find that `stacey` is object that called the method to see what `this` refers to.
@@ -2129,7 +2129,7 @@ var stacey = {
   age: 34
 }
 
-sayName.call(stacey)
+sayName.call(stacey) // Stacey
 ```
 
 What we can do is type the function name and then use the `call` method, which is available to every function, to do just that.
@@ -2141,7 +2141,7 @@ So now the `sayName` function is going to be invoked but the `this` keyword insi
 So in this example we're explicitly stating what the `this` keyword is when we use `call`. It is the very first argument we pass to `call`.
 
 > `.call()` provides a new value of **this** to the function/method.
-> 
+>
 > With call, you can write a method once and then inherit it in another object, without having to rewrite the method for the new object.
 >
 > Additional arguments to the function are passed in one by one after the first argument.
@@ -2294,3 +2294,415 @@ The four rules in a quick recap.
 - **Explicit Binding** - tells a function what the context of the `this` keyword is going to be using **call**, **apply**, or **bind**
 - **new Binding** - is whenever you have a function invoked with the **new** keyword where the `this` keyword is bound to the new object being constructed
 - **window Binding** - if none of the previous rules apply then the `this` keyword is going to default to the **window** object unless you're in strict mode in which case it will be `undefined`
+
+## 10. Component State
+### 10.1 'Popular' Component
+This is a screenshot of the completed UI we're building.
+
+[![Popular Component](./assets/images/21-small.jpg)](./assets/images/21.jpg)
+
+It has a component called **Popular** that allows us to change the selected language. Clicking a language highlights that language and displays the most popular related repositories.
+
+[![Popular Language](./assets/images/22-small.jpg)](./assets/images/22.jpg)
+
+For now we are just going to focus on building this component in order to learn how to update state.
+
+### 10.2 Update App Structure
+We start by moving the component code out of **index.js**. We just want to require the main App without defining any components inside.  We do this by copying the component and updating the file like this.
+
+```jsx
+// index.js
+var React = require('react');
+var ReactDOM = require('react-dom');
+require('./index.css');
+var App = require('./components/App');
+
+ReactDOM.render(<App />, document.getElementById('app'));
+```
+
+Next we create a **components** directory and create **App.js**. In it we paste the component we just copied out of **index.js**
+
+Next, because we are requiring the App component in index.js with this line,
+
+- `var App = require('./components/App');`
+
+we need to export it from here.
+
+```jsx
+// components/App.js
+var React = require('react');
+var Popular = require('./Popular');
+
+class App extends React.Component {
+  render() {
+    return (
+      <div className="container">
+        <Popular />
+      </div>
+    );
+  }
+}
+
+module.exports = App;
+```
+
+We do this with `module.exports = App;`. This is called CommonJS.
+
+We are also requiring and using the `<Popular />` component that we will create in the next section.
+
+Lastly, we add a `className` attribute to the div so we can style the container.
+
+The style sheet looks like this.
+
+```css
+/* index.css */
+html, body {
+  box-sizing: border-box;
+  background: lightgreen;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  /* max-width: 1200px; */
+}
+```
+
+### 10.3 Build Component
+Next we move on to building the component. We start with a basic skeletal structure.
+
+```jsx
+// components/Popular.js
+var React = require('react');
+
+class Popular extends React.Component {
+  render() {
+    return (
+      <div>Popular!</div>
+    );
+  }
+}
+
+module.exports = Popular;
+```
+
+Next we create an array of languages and **.map** over it in the view making sure to add a key to each `<li>` element.
+
+```jsx
+// components/Popular.js
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          return (
+            <li key={lang}>
+              {lang}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+```
+
+Two things to note.
+
+1. Whenever we return JSX we wrap it in parens so the compiler doesn't insert a semi after the return statement.
+2. We add a `className` to our `<ul>` element in order to style the list.
+
+Here's the style we applied.
+
+```css
+/* index.css */
+ul { padding: 0; }
+li { list-style: none; }
+
+.languages {
+  display: flex;
+  justify-content: center;
+}
+
+.languages li {
+  margin: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+```
+
+### 10.4 Add State
+Next we'll add state. The reason we need to add state is so we can keep track of whichever tab is active. This allows us to do two things.
+
+1. Highlight it when its selected
+2. Render the list of repositories based on the currently selected tab
+
+### 10.5 Set Default State
+The way we do this is by adding a constructor to the Popular class.
+
+Constructors are not unique to React but are part of classes in JavaScript 2015.
+
+Whenever we add a constructor we always need to call `super()` passing in `props`. We'll discuss why later.
+
+```jsx
+// components/Popular.js
+class Popular extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+```
+
+The way state is set on a component is by assigning an object to `this.state` with properties we want to track.
+
+In this case we add a `selectedLanguage` property to our state object and set it to 'All'. 'All' corresponds to one of the `language` array values.
+
+```jsx
+// components/Popular.js
+class Popular extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedLanguage: 'All'
+    };
+  }
+
+  render() {
+    // our render code...
+  }
+}
+```
+
+Setting this in our constructor establishes the default state for our `selectedLanguage` property.
+
+### 10.6 Update State Function
+So far we have the following:
+
+- Our UI for this component
+- Our initial state for this component
+
+What we need  now is a way to update that state whenever we click on a specific tab.
+
+We start by creating a new method inside of our class called `updateLanguage()`. We pass that function a `lang` argument and inside that function we call `this.setState()`.
+
+```jsx
+// components/Popular.js
+class Popular extends React.Component {
+  constructor(props) {
+    // our constructor  code...
+  }
+
+  updateLanguage(lang) {
+    this.setState(function() {
+      return {
+        selectedLanguage: lang
+      }
+    });
+  }
+
+  render() {
+    // our render code...
+  }
+}
+```
+
+When we call `this.setState()` we pass it a function and whatever that function returns is going to be the new state.
+
+The function returns a new object with `lang` assigned to the `selectedLanguage` property.
+
+### 10.7 Click Handler
+
+What we have so far is:
+
+- Our UI for this component (render)
+- Our initial state for this component (constructor)
+- A way to update that state (updateLanguage)
+
+The next thing we need to do is hook up the `updateLanguage` function to the click of each list item so we can update our `selectedLanguage`.
+
+#### Context of 'this'
+
+One thing to keep in mind is that we are invoking `this.setState` inside of `updateLanguage` but we don't know what `this` is bound to until `updateLanguage` is invoked.
+
+The problem is, if `updateLanguage` is invoked in the wrong context then `this` keyword will be bound to the wrong object and `this.setState` will be undefined.
+
+One way we can establish what `this` keyword is for a specific function is by using the `.bind()` method.
+
+`.bind()` returns us a new function with the `this` keyword set to the object/value we specify.
+
+The best place to bind this to our function is in our constructor.
+
+```jsx
+// components/Popular.js
+class Popular extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedLanguage: 'All'
+    };
+    this.updateLanguage = this.updateLanguage.bind(this); // <- here
+  }
+
+  updateLanguage(lang) {
+    this.setState(function() {
+      return {
+        selectedLanguage: lang
+      };
+    });
+  }
+
+  render() {
+    // our render code
+  }
+```
+
+To recap:
+
+1. The problem is we won't know what `this` keyword in `updateLanguage` is bound to until `updateLanguage` is invoked.
+2. Since `.bind()` returns a new function with `this` keyword bound to the value we give it, we pass the current `this` context to the `.bind()` method and assign it to the current `this.updateLanguage` function.
+
+Now it's finally time to add our click handler to the `<li>` element.  
+
+Here we add an `onClick` handler to our list item and whenever it is clicked it will run `this.updateLanguage`.
+
+The problem is that `this` inside of map is different than `this` outside of map. We can see this by adding console.log outside the map function and one inside the map function.
+
+```jsx
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+    console.log('Outside of map', this); {/* outer console.log */}
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          console.log('Inside of map', this); {/* inner console.log */}
+          return (
+            <li
+              key={lang}
+              onClick={this.updateLanguage}
+            >
+              {lang}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+```
+
+[![console](./assets/images/23-small.jpg)](./assets/images/23.jpg)
+
+A pretty typical problem when it comes to `.map()` is that `this` changes context inside the callback. For this reason `map()` allows us to provide a second argument which is the `this` context.
+
+```jsx
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+    console.log('Outside of map', this); {/* outer console.log */}
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          console.log('Inside of map', this); {/* inner console.log */}
+          return (
+            <li
+              key={lang}
+              onClick={this.updateLanguage}
+            >
+              {lang}
+            </li>
+          );
+        }, this)} {/* we pass in 'this' context to map */}
+      </ul>
+    );
+  }
+```
+
+Now `this` keyword inside the function is the same as `this` keyword outside the function.
+
+[![console](./assets/images/24-small.jpg)](./assets/images/24.jpg)
+
+> **NOTE:** One thing to keep in mind with ES5 is that each time we use an anonymous function as a argument to a method or function, `this` context changes inside that method or function.
+>
+> That is not the case with ES6 arrow functions. With ES6 arrow functions `this` keeps the context of the parent block.
+>
+> Therefore higher-order functions like `.map()` allow you to pass in `this` context as the second argument.
+>
+> ```js
+> var arr = [1,2,3];
+>
+> function logNum(num) {
+>   console.log(num);
+> }
+>
+> var newArr = arr.map(function(num) {
+>   'use strict';
+>   this.logNum(num); // <- this would normally be undefined
+>   return num * 2;
+> }, this); // <- it's not bc we passed in the parent context for this
+> ```
+>
+> Keep in mind that `this` defaults to the global object, which is `window` in a browser, if not in strict mode.
+
+The next issue we have is that `updateLanguage` expects an argument of `lang` in order to update the state.
+
+Right now we're not passing in the `lang` parameter to our function. We're just invoking it.
+
+We're now going to use `.bind()` again because not only does it allow us to set the `this` context but it also allows us to pass arguments with the function.
+
+Since we've already used `.bind()` to establish the context of `updateLanguage` we just pass in `null` as the first argument and `lang` as the second since whatever number arguments we pass `bind` after the first one will be passed to the new function.
+
+```jsx
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          return (
+            <li
+              key={lang}
+              onClick={this.updateLanguage.bind(null, lang)} // use bind
+            >
+              {lang}
+            </li>
+          );
+        }, this)} {/* we pass in 'this' context to map */}
+      </ul>
+    );
+  }
+```
+
+We can test by adding `<p>Selected Language: {this.state.selectedLanguage}</p>` after the opening `<ul>` and click each tab to see the state change.
+
+### 10.8 Selection Highlight
+The last thing to do is add highlighting for the selected tab.
+
+We can do this by using the `style` property. What `style` does is it allows you to inline any styles you want the component to have.
+
+We'll use a quick ternary to do this by testing if `lang` is equal to `selectedLanguage` in state.
+
+```jsx
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          return (
+            <li
+              key={lang}
+              onClick={this.updateLanguage.bind(null, lang)} // use bind
+              style={
+                lang === this.state.selectedLanguage // test
+                  ? { color: '#d0021b' }  // highlight if equal
+                  : null  // otherwise pass in null
+              }
+            >
+              {lang}
+            </li>
+          );
+        }, this)} {/* we pass in 'this' context to map */}
+      </ul>
+    );
+  }
+```
+
+Now when we click around each of the tabs highlights in turn.
+
+[![Popular component](./assets/images/25-small.jpg)](./assets/images/25.jpg)
