@@ -1528,10 +1528,10 @@ Here's some sample code:
 
 ```js
 var getProfilePic = function (username) {
-  return 'https://photo.fb.com/' + username
+  return 'https://github.com/' + username + '.png?size=200'
 }
 var getProfileLink = function (username) {
-  return 'https://www.fb.com/' + username
+  return 'https://github.com/' + username
 }
 var getProfileData = function (username) {
   return {
@@ -1539,7 +1539,7 @@ var getProfileData = function (username) {
     link: getProfileLink(username)
   }
 }
-getProfileData('tylermcginnis')
+getProfileData('james-priest')
 ```
 
 We have three functions and one function invocation. The code is clean and organized because we've separated everything out into different functions.
@@ -1557,14 +1557,14 @@ Here you'll really see the beauty of React's **render** method.
 class ProfilePic extends React.Component {
   render() {
     const { username } = this.props;
-    return <img src={`https://photo.fb.com/${username}`} alt="" />;
+    return <img src={`https://github.com/${username}.png?size=200`} alt="" />;
   }
 }
 
 class ProfileLink extends React.Component {
   render() {
     const { username } = this.props;
-    return <a href={`https://www.fb.com/${username}`}>{username}</a>;
+    return <a href={`https://github.com/${username}`}>{username}</a>;
   }
 }
 
@@ -1821,8 +1821,7 @@ ReactDOM.render(
 If we change the img prop from a string to an object like this.
 
 ```jsx
-{% raw %}
-ReactDOM.render(
+ReactDOM.render({% raw %}
   <Badge
     name="James Priest"
     username="james-priest"
@@ -1831,8 +1830,7 @@ ReactDOM.render(
     }}
   />,
   document.getElementById('app')
-);
-{% endraw %}
+);{% endraw %}
 ```
 
 Then we will get a console warning telling us about the issue.
@@ -2329,7 +2327,7 @@ Next, because we are requiring the App component in index.js with this line,
 we need to export it from here.
 
 ```jsx
-// components/App.js
+// App.js
 var React = require('react');
 var Popular = require('./Popular');
 
@@ -2374,7 +2372,7 @@ html, body {
 Next we move on to building the component. We start with a basic skeletal structure.
 
 ```jsx
-// components/Popular.js
+// Popular.js
 var React = require('react');
 
 class Popular extends React.Component {
@@ -2391,7 +2389,7 @@ module.exports = Popular;
 Next we create an array of languages and **.map** over it in the view making sure to add a key to each `<li>` element.
 
 ```jsx
-// components/Popular.js
+// Popular.js
   render() {
     var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
     return (
@@ -2446,7 +2444,7 @@ Constructors are not unique to React but are part of classes in JavaScript 2015.
 Whenever we add a constructor we always need to call `super()` passing in `props`. We'll discuss why later.
 
 ```jsx
-// components/Popular.js
+// Popular.js
 class Popular extends React.Component {
   constructor(props) {
     super(props);
@@ -2458,7 +2456,7 @@ The way state is set on a component is by assigning an object to `this.state` wi
 In this case we add a `selectedLanguage` property to our state object and set it to 'All'. 'All' corresponds to one of the `language` array values.
 
 ```jsx
-// components/Popular.js
+// Popular.js
 class Popular extends React.Component {
   constructor(props) {
     super(props);
@@ -2486,7 +2484,7 @@ What we need  now is a way to update that state whenever we click on a specific 
 We start by creating a new method inside of our class called `updateLanguage()`. We pass that function a `lang` argument and inside that function we call `this.setState()`.
 
 ```jsx
-// components/Popular.js
+// Popular.js
 class Popular extends React.Component {
   constructor(props) {
     // our constructor  code...
@@ -2533,7 +2531,7 @@ One way we can establish what `this` keyword is for a specific function is by us
 The best place to bind this to our function is in our constructor.
 
 ```jsx
-// components/Popular.js
+// Popular.js
 class Popular extends React.Component {
   constructor(props) {
     super(props);
@@ -2568,6 +2566,7 @@ Here we add an `onClick` handler to our list item and whenever it is clicked it 
 The problem is that `this` inside of map is different than `this` outside of map. We can see this by adding console.log outside the map function and one inside the map function.
 
 ```jsx
+// Popular.js
   render() {
     var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
     console.log('Outside of map', this); {/* outer console.log */}
@@ -2594,6 +2593,7 @@ The problem is that `this` inside of map is different than `this` outside of map
 A pretty typical problem when it comes to `.map()` is that `this` changes context inside the callback. For this reason `map()` allows us to provide a second argument which is the `this` context.
 
 ```jsx
+// Popular.js
   render() {
     var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
     console.log('Outside of map', this); {/* outer console.log */}
@@ -2650,6 +2650,7 @@ We're now going to use `.bind()` again because not only does it allow us to set 
 Since we've already used `.bind()` to establish the context of `updateLanguage` we just pass in `null` as the first argument and `lang` as the second since whatever number arguments we pass `bind` after the first one will be passed to the new function.
 
 ```jsx
+// Popular.js
   render() {
     var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
     return (
@@ -2679,6 +2680,7 @@ We can do this by using the `style` property. What `style` does is it allows you
 We'll use a quick ternary to do this by testing if `lang` is equal to `selectedLanguage` in state.
 
 ```jsx
+// Popular.js
   render() {
     var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
     return (
@@ -2706,3 +2708,283 @@ We'll use a quick ternary to do this by testing if `lang` is equal to `selectedL
 Now when we click around each of the tabs highlights in turn.
 
 [![Popular component](./assets/images/25-small.jpg)](./assets/images/25.jpg)
+
+## 11. Stateless Fn Components
+### 11.1 Stateless Fn Explained
+We were first introduced to Stateless Functional Components during the "UI Composition" section.
+
+> If you're using React correctly, you're going to notice you have a lot of components that simply take in some data via props and output some UI - that is, components with just a render method.
+
+The reason for this is because a really great paradigm to get used to is separating your components into **container components** and **presentational components**, with presentational components optionally taking in some data and rendering a view.
+
+Because this is such a common pattern in React, as of React 0.14 you can now have components that are just normal functions *if those components only have a **render** method and optional **props***.
+
+Let's take a look at an example.
+
+```jsx
+// class component
+class HelloWorld extends React.Component {
+  render () {
+    return (
+      <div>Hello {this.props.name}</div>
+    )
+  }
+}
+ReactDOM.render(<HelloWorld name='Tyler' />, document.getElementById('app'))
+```
+
+Here's an example you've seen before and you should be very comfortable with at this point. We've created a new React component that returns us a div that says "Hello " + whatever name you passed in when you invoked the component.
+
+You'll notice that this component just has a render method, that means we can remove the React.Component abstraction and just use a plain function.
+
+Refactored to use a *stateless functional component*, the example above would look like this
+
+```jsx
+// stateless functional component
+function HelloWorld (props) {
+  return (
+    <div>Hello {props.name}</div>
+  )
+}
+ReactDOM.render(<HelloWorld name='Tyler' />, document.getElementById('app'))
+```
+
+Notice React passes **props** to your function as the first argument to the function. This is a lot cleaner and makes creating React components more natural since you're literally just making a function.
+
+> It's a good idea to try to use as many Stateless Functional Components as possible because then you have a good separation of presentational components vs other components.
+
+Now you'll notice I'm being very explicit with saying "Stateless Functional Components" rather than just "Functional Components". That's because future Functional Components may be able to contain state, [here's a blog post I wrote](http://tylermcginnis.com/functional-components-vs-stateless-functional-components-vs-stateless-components) that goes into more detail if you're interested in the naming convention.
+
+<!-- 
+### 11.2 Refactor 'Popular'
+Let's refactor the 'Popular' component by moving the render code out to become it's own stateless functional component.
+
+If we look at the View output by the Popular component you'll see it consists of two parts. The list which shows our selected language and the grid which shows the repos that match our language selection.
+
+[![Popular component](./assets/images/26-small.jpg)](./assets/images/26.jpg)
+
+Right now we are rendering our list inside the Popular component. What we want to do is have Popular eventually encapsulate both the list and the grid so that it is as declarative as possible.
+
+Let's start by refactoring our list's render code to become it's own component.
+
+Typically we create a component in it's own file but since this list is very specific to the popular component we will just include it at the top of the Popular.js file. If at any point in the future we want to reuse the component elsewhere we can move it to it's own file and import/export as usual.
+
+We start by creating a class.
+
+```jsx
+// Popular.js
+class SelectLanguage extends React.Component {
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          return (
+            <li
+              key={lang}
+              onClick={this.updateLanguage.bind(null, lang)}
+              style={
+                lang === this.state.selectedLanguage
+                  ? { color: '#d0021b' }
+                  : null
+              }
+            >
+              {lang}
+            </li>
+          );
+        }, this)}
+      </ul>
+    );
+  }
+}
+```
+
+The problem is that `this.updateLanguage.bind(null, lang)` and `this.state.selectedLanguage` are defined in Popular. So what we want to do is pass these in as **props**.
+
+We will change these in SelectLanguage to:
+
+- `this.props.onSelect.bind(null, lang)`
+- `this.props.selectedLanguage`
+
+We'll also want to add some PropTypes to define what props our component should receive.
+
+We'll add:
+
+```jsx
+// Popular.js
+var PropTypes = require('prop-types');
+
+selectedLanguage.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+  selectedLanguage: PropTypes.string.isRequired
+}
+```
+
+Next we need to update Popular's render() method to include the SelectedLanguage component passing in both our `selectedLanguage` and `updateLanguage` props.
+
+```jsx
+// Popular.js
+class Popular extends React.Component {
+  constructor(props) {...}
+
+  updateLanguage(lang) {...}
+
+  render() {
+    return (
+      <div>
+        <SelectedLanguage
+          onSelect={this.updateLanguage}
+          selectedLanguage={this.state.selectedLanguage}
+        />
+      </div>
+    );
+  }
+}
+```
+
+At this point our app should function exactly the same. We haven't changed anything other than moving some of the underlying details of our app's construction around.
+
+One way you can tell that you're building a clean React app is if you have a lot of components that look like this, where basically all they do is they take in some props and render out a UI.
+
+```jsx
+// Popular.js
+class SelectLanguage extends React.Component {
+  render() {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+
+    return (
+      <ul className="languages">
+        {languages.map(function(lang) {
+          return (
+            <li
+              key={lang}
+              onClick={this.updateLanguage.bind(null, lang)}
+              style={
+                lang === this.state.selectedLanguage
+                  ? { color: '#d0021b' }
+                  : null
+              }
+            >
+              {lang}
+            </li>
+          );
+        }, this)}
+      </ul>
+    );
+  }
+}
+```
+
+There's not a whole lot of complexity going on here because there's no state, and nothing to change. It just takes in props and renders a UI.
+
+Because this is a common pattern in React, React makes it easy if all our component has is our render method, then instead of creating an entire class for our component we can create a function, and whatever this function returns will be the UI for that component.
+
+Once again, if all our component contains is a **render** method then what we can do instead is create a function that is basically going to return a UI.
+
+Here's the structure. Notice that we drop the render() method and that the first argument is props.
+
+```jsx
+function SelectLanguage(props) {
+  return (
+    <div>Some UI</div>
+  )
+}
+```
+
+Here's the refactored code. Notice we remove the `this` keyword from in front of props and from the map() method.
+
+```jsx
+// Popular.js
+function SelectedLanguage(props) {
+  var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+
+  return (
+    <ul className="languages">
+      {languages.map(function(lang) {
+        return (
+          <li
+            key={lang}
+            onClick={props.onSelect.bind(null, lang)}
+            style={
+              lang === props.selectedLanguage ? { color: '#d0021b' } : null
+            }
+          >
+            {lang}
+          </li>
+        );
+      })} {/* notice 'this' is no longer necessary as map()'s 2nd argument */}
+    </ul>
+  );
+}
+```
+
+Here is the completed code where SelectLanguage is now refactored as a *stateless functional component*.
+
+```jsx
+// Popular.js
+var React = require('react');
+var PropTypes = require('prop-types');
+
+function SelectedLanguage(props) {
+  var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+
+  return (
+    <ul className="languages">
+      {languages.map(function(lang) {
+        return (
+          <li
+            key={lang}
+            onClick={props.onSelect.bind(null, lang)}
+            style={
+              lang === props.selectedLanguage ? { color: '#d0021b' } : null
+            }
+          >
+            {lang}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+SelectedLanguage.propTypes = {
+  selectedLanguage: PropTypes.string.isRequired,
+  onSelect: PropTypes.func.isRequired
+};
+
+class Popular extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedLanguage: 'All'
+    };
+    this.updateLanguage = this.updateLanguage.bind(this);
+  }
+
+  updateLanguage(lang) {
+    this.setState(function() {
+      return {
+        selectedLanguage: lang
+      };
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <SelectedLanguage
+          selectedLanguage={this.state.selectedLanguage}
+          onSelect={this.updateLanguage}
+        />
+      </div>
+    );
+  }
+}
+
+module.exports = Popular;
+```
+
+We've now abstracted all the complexity of SelectLanguage out into a stateless functional component but can include that in our stateful Popular component.
+
+### 11.3 Private Components -->
