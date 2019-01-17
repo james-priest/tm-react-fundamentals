@@ -2985,3 +2985,149 @@ module.exports = Popular;
 ```
 
 We've now abstracted all the complexity of SelectLanguage out into a stateless functional component but can include that in our stateful Popular component.
+
+### 11.3 Private Components
+By now you've heard over and over about the benefits of stateless functional components and functions that just return some UI. We can take our enamoration even one step further.
+
+Let's say we have the code below.
+
+```jsx
+var React = require('react');
+
+function FriendsList (props) {
+  return (
+    <h1>Friends:</h1>
+    <ul>
+      {props.friends.map(function (friend, index) {
+        return <li key={friend}>{friend}</li>    
+      })}
+    </ul>
+  )
+}
+ 
+module.exports = FriendsList
+```
+
+So we have a FriendList component which is just returning us a header and an unordered list of friends.
+
+This looks great, but remember, React is all about modularity. As your render method grows, it's a good habit to take pieces and abstract them to new components. Why not create another stateless functional component that's in charge of handling each friend?
+
+```jsx
+var React = require('react');
+
+function FriendItem (props) {
+  return <li>{props.friend}</li>
+}
+
+function FriendsList (props) {
+  return (
+    <h1>Friends:</h1>
+    <ul>
+      {props.friends.map(function (friend, index) {
+        return <FriendItem friend={friend} key={friend} />
+      })}
+    </ul>
+  )
+}
+module.exports = FriendsList
+```
+
+Notice that all we've done is essentially create a "private component" just as we would a private function.
+
+> One thing I really like about stateless functional components that I haven't mentioned up until this point is that they have no "this" keyword associated with them.
+>
+> If you're familiar with the "this" keyword you know that it allows you to call a function in a different context. What that means is that if you're using the "this" keyword, you're not 100% sure what the implementation of said function will look like.
+>
+> By removing the option to have a "this" keyword, we've removed the one way in which our function can be called in a way we're not expecting.
+
+### 11.4 Fn vs Stateless Fn
+Earlier today I read Dan Abramov’s [React Components, Elements, and Instances](https://medium.com/@dan_abramov/react-components-elements-and-instances-90800811f8ca#.b7hh0fbh9) article. As always I loved the article but even more than that, this time, I loved Dan’s focus on using proper vocabulary to describe technical topics. That post gave me the idea for this post. Three ways to describe React components which are often used incorrectly 
+
+- Stateless Components
+- Stateless Functional Components
+- Functional Components.
+
+Let’s look at the differences between the three.
+
+#1 Stateless Components
+
+```jsx
+const Repos = React.createClass({
+  render(){
+    return (
+      <div>
+        <h3> User Repos </h3>
+        <ul className="list-group">
+          {this.props.repos.map((repo, index) => {
+            return (
+              <li className="list-group-item" key={repo.name}>
+                <h4><a href={repo.html_url}>{repo.name}</a></h4>
+                <p>{repo.description}</p>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    )
+  }
+})
+class Repos extends React.Component {
+  render(){
+    return (
+      <div>
+        <h3> User Repos </h3>
+        <ul className="list-group">
+          {this.props.repos.map((repo, index) => {
+            return (
+              <li className="list-group-item" key={repo.name}>
+                <h4><a href={repo.html_url}>{repo.name}</a></h4>
+                <p>{repo.description}</p>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    )
+  }
+}
+```
+
+All the code above does is it receives an array of repositories of a specific user, maps over those repositories, and displays them to the view.
+
+You should feel pretty at home with the code above. *createClass* has been around since the heavens opened and bestowed React upon us and *React.Component* has been around since React 0.13.0 Beta 1 (January 2015). Neither component is using getInitialState or a constructor to initialize a state property. Each component is receiving its data as props then simply presenting that data.
+
+#2 Stateless Functional Components
+
+```jsx
+const Repos = ({repos}) => {
+  return (
+    <div>
+      <h3> User Repos </h3>
+      <ul className="list-group">
+        {repos.map((repo, index) => {
+          return (
+            <li className="list-group-item" key={repo.name}>
+              <h4><a href={repo.html_url}>{repo.name}</a></h4>
+              <p>{repo.description}</p>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+```
+
+Notice the code above is just a function (granted a fancy ES6 function but that’s besides the point). If your component has just a *render* method (and no state), you can simply create your component as a *Stateless Functional Component* and your function will be passed *props* as its first argument. Also notice that we’re NOT calling this a *Stateless Component* or a *Functional Component*. The reason for that brings us to number 3.
+
+#3 Functional Components
+
+```text
+const ReposWithState = () => {
+  ¯\_(ツ)_/¯
+}
+```
+
+[In the future, React will have Functional Components that contain their own state](https://twitter.com/sebmarkbage/status/658713924607606784). This is the reason why the code in #2 above shouldn’t be called a Stateless Component nor should it be described as a Functional Component, because future Functional Components will also be able to have their own state.
+
+I realize this might come off as hairsplitting, but I strongly believe that clearly understanding the vocabulary for technical topics will make learning and teaching said topics much easier.
