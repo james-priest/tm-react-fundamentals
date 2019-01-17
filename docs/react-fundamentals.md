@@ -2755,7 +2755,6 @@ Notice React passes **props** to your function as the first argument to the func
 
 Now you'll notice I'm being very explicit with saying "Stateless Functional Components" rather than just "Functional Components". That's because future Functional Components may be able to contain state, [here's a blog post I wrote](http://tylermcginnis.com/functional-components-vs-stateless-functional-components-vs-stateless-components) that goes into more detail if you're interested in the naming convention.
 
-<!-- 
 ### 11.2 Refactor 'Popular'
 Let's refactor the 'Popular' component by moving the render code out to become it's own stateless functional component.
 
@@ -2986,5 +2985,3 @@ module.exports = Popular;
 ```
 
 We've now abstracted all the complexity of SelectLanguage out into a stateless functional component but can include that in our stateful Popular component.
-
-### 11.3 Private Components -->
